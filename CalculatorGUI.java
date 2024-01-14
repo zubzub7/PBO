@@ -15,6 +15,7 @@ public class CalculatorGUI {
 
         JPanel displayPanel = new JPanel();
         displayPanel.setLayout(new BorderLayout());
+        displayPanel.setBackground(new Color(217, 217, 217, 255));
 
         displayLabel = new JLabel("0", JLabel.RIGHT);
         displayLabel.setFont(new Font("Monospace", Font.BOLD, 30));
@@ -83,11 +84,5 @@ public class CalculatorGUI {
 
     public void setCalculatorLogic(CalculatorLogic calculatorLogic) {
         this.calculatorLogic = calculatorLogic;
-    }
-
-    public static void main(String[] args) {
-        CalculatorLogic calculatorLogic = new CalculatorLogic();
-        CalculatorGUI calculatorGUI = new CalculatorGUI();
-        calculatorGUI.setCalculatorLogic(calculatorLogic);
     }
 }
