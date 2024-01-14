@@ -59,16 +59,6 @@ public class CalculatorLogic {
             baseNumber = currentNumber;
             currentOperator = operator;
             isNewInput = true;
-        } else if (operator.equals("ln")) {
-            if (currentNumber <= 0) {
-                currentExpression = new StringBuilder("Error!");
-                result = Double.NaN;
-            } else {
-                result = Math.log(currentNumber);
-                currentExpression.append("ln(").append(currentNumber).append(")");
-            }
-            currentOperator = "";
-            isNewInput = true;
         } else if (!operator.equals("=")) {
             calculateTotal();
             currentOperator = operator;
@@ -106,27 +96,28 @@ public class CalculatorLogic {
     public void calculateTotal() {
         if (!currentOperator.isEmpty()) {
             double operand2 = currentNumber;
+            currentExpression.setLength(0);
             switch (currentOperator) {
                 case "sin":
                     result = Math.sin(Math.toRadians(operand2));
-                    currentExpression.append("sin(").append(operand2).append(")");
+                    currentExpression.append("sin(").append(operand2).append(") ");
                     break;
                 case "cos":
                     result = Math.cos(Math.toRadians(operand2));
-                    currentExpression.append("cos(").append(operand2).append(")");
+                    currentExpression.append("cos(").append(operand2).append(") ");
                     break;
                 case "tan":
                     result = Math.tan(Math.toRadians(operand2));
-                    currentExpression.append("tan(").append(operand2).append(")");
+                    currentExpression.append("tan(").append(operand2).append(") ");
                     break;
                 case "log":
                     result = Math.log(operand2);
-                    currentExpression.append("log(").append(operand2).append(")");
+                    currentExpression.append("log(").append(operand2).append(") ");
                     break;
                 case "!":
-                    currentExpression.append(operand2).append("!");
+                    currentExpression.append(operand2).append("! ");
                     if (operand2 < 0) {
-                        currentExpression = new StringBuilder("Error!");
+                        currentExpression = new StringBuilder("Error! ");
                         result = Double.NaN;
                     } else {
                         result = 1;
@@ -135,40 +126,63 @@ public class CalculatorLogic {
                         }
                     }
                     break;
-                case "\u03C0":
+                case "\u03C0": // x phi
+                    currentExpression.append(operand2).append(" x \u03C0 ");
                     result = Math.PI * operand2;
-                    currentExpression.append(operand2).append(" x \u03C0");
+
                     break;
-                case "x\u00B2":
-                    currentExpression.append(operand2).append("\u00B2");
+                case "x\u00B2": // pow 2
+                    currentExpression.append(operand2).append("\u00B2 ");
                     result = Math.pow(operand2, 2);
                     break;
-                case "x\u00B3":
-                    currentExpression.append(operand2).append("\u00B3");
+                case "x\u00B3": // pow 3
+                    currentExpression.append(operand2).append("\u00B3 ");
                     result = Math.pow(operand2, 3);
                     break;
-                case "\u221A":
+                case "\u221A": // sqrt
                     result = Math.sqrt(operand2);
-                    currentExpression.append("\u221A").append(operand2);
+                    currentExpression.append("\u221A").append(operand2).append(" ");
                     break;
-                case "\u0025":
-                    result = currentNumber / 100;
-                    currentExpression.append(operand2).append("%");
+                case "\u0025": // mod
+                    currentExpression.append(result).append(" % ").append(operand2).append(" ");
+                    result %= operand2;
                     break;
-                case "\u2797":
-                case "x\u02B8":
-                case "\u2A09":
-                case "\u2796":
-                case "\u2795":
+                case "\u2797": // divide
+                    currentExpression.append(result).append(" / ").append(operand2).append(" ");
+                    try {
+                        if (operand2 != 0) {
+                            result /= operand2;
+                        } else {
+                            throw new ArithmeticException("Error: Division By Zero ");
+                        }
+                    } catch (ArithmeticException e) {
+                        String errorMessage = e.getMessage();
+                        currentExpression = new StringBuilder(errorMessage);
+                        result = Double.NaN;
+                    }
+                    break;
+                case "x\u02B8": // x^y
+                    currentExpression.append(baseNumber).append(" ^ ").append(operand2).append(" ");
+                    result = Math.pow(baseNumber, operand2);
+                    break;
+                case "\u2A09": // times
+                    currentExpression.append(result).append(" x ").append(operand2).append(" ");
                     result = performDecimalOperation(currentOperator, result, operand2);
-                    currentExpression.append(" ").append(currentOperator).append(" ").append(operand2);
+                    break;
+                case "\u2796": // sub
+                    currentExpression.append(result).append(" - ").append(operand2).append(" ");
+                    result = performDecimalOperation(currentOperator, result, operand2);
+                    break;
+                case "\u2795": // sum
+                    currentExpression.append(result).append(" + ").append(operand2).append(" ");
+                    result = performDecimalOperation(currentOperator, result, operand2);
                     break;
                 case "ln":
-                    if (operand2 > 0) {
-                        result = Math.log(operand2);
-                        currentExpression.append("ln(").append(operand2).append(")");
+                    if (result > 0) {
+                        currentExpression.append("ln(").append(operand2).append(") ");
+                        result = performDecimalOperation(currentOperator, result, operand2);
                     } else {
-                        currentExpression = new StringBuilder("Error!");
+                        currentExpression = new StringBuilder("Error: ln of non-positive number");
                         result = Double.NaN;
                     }
                     break;
@@ -181,16 +195,14 @@ public class CalculatorLogic {
 
     private double performDecimalOperation(String operator, double operand1, double operand2) {
         switch (operator) {
-            case "\u2797":
-                return operand1 / operand2;
-            case "x\u02B8":
-                return Math.pow(operand1, operand2);
-            case "\u2A09":
-                return operand1 * operand2;
-            case "\u2796":
+            case "\u2A09": // times
+            return operand1 * operand2;
+            case "\u2796": // sub
                 return operand1 - operand2;
-            case "\u2795":
+            case "\u2795": // sum
                 return operand1 + operand2;
+            case "ln":
+                return Math.log(operand2);
             default:
                 return 0;
         }
