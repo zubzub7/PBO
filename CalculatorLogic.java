@@ -221,7 +221,7 @@ public class CalculatorLogic {
         if (decimalInput) {
             return String.valueOf(currentNumber);
         } else {
-            return String.valueOf((int) currentNumber);
+            return String.valueOf((double) currentNumber);
         }
     }
 
