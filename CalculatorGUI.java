@@ -9,7 +9,7 @@ public class CalculatorGUI {
     private JLabel expressionLabel;
 
     public CalculatorGUI() {
-        frame = new JFrame("Calculator");
+        frame = new JFrame("Calculator Scientific");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocation(550, 250);
 
